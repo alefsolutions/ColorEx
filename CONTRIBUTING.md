@@ -1,3 +1,5 @@
+<img src="assets/github-banner.png" alt="GitHub Banner" width="100%" />
+
 # Contributing to ColorEx
 
 We love your input! We want to make contributing to this project as easy and transparent as possible, whether it's:

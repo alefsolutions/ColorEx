@@ -1,3 +1,5 @@
+<img src="assets/github-banner.png" alt="GitHub Banner" width="100%" />
+
 Apache License
 Version 2.0, January 2004
 http://www.apache.org/licenses/

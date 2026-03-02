@@ -1,3 +1,5 @@
+<img src="../assets/github-banner.png" alt="GitHub Banner" width="100%" />
+
 # Docs
 
 ColorEx documentation placeholder.

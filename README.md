@@ -1,3 +1,5 @@
+<img src="assets/github-banner.png" alt="GitHub Banner" width="100%" />
+
 # ColorEx
 
 ColorEx is a lightweight Python library for rendering tabular numeric data into deterministic 2D heatmaps.

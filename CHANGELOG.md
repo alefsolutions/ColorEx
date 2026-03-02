@@ -1,3 +1,5 @@
+<img src="assets/github-banner.png" alt="GitHub Banner" width="100%" />
+
 # Changelog
 
 ## [0.2.0] - 2026-03-03

@@ -1,3 +1,5 @@
+<img src="../assets/github-banner.png" alt="GitHub Banner" width="100%" />
+
 # Examples
 
 Run these from the project root.
