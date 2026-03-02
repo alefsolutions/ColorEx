@@ -120,6 +120,15 @@ Methods:
 - `to_image(path) -> None` (requires Pillow)
 - `show() -> None` (opens image with system viewer; requires Pillow)
 
+## Current Limitations
+
+- No native Tkinter interactive window renderer in the current `colorex` package.
+- HTML output is renderer-defined; there is no external template/plugin system yet.
+- `show()` is an image preview path (via Pillow), not an interactive heatmap UI.
+- PNG export depends on optional Pillow installation.
+- DataFrame support requires optional pandas installation (`colorex[pandas]`).
+- The current renderer focuses on cell color/value visualization and does not yet expose advanced chart features (for example: clustering, annotations, or dashboard embedding components).
+
 ## Development
 
 Install dev dependencies:
