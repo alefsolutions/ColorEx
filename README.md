@@ -137,4 +137,4 @@ Runnable examples are in `examples/`:
 
 ## License
 
-MIT. See [LICENSE.md](LICENSE.md).
+Apache License 2.0. See [LICENSE.md](LICENSE.md).

@@ -8,7 +8,7 @@ version = "0.2.0"
 description = "Lightweight Python heatmap rendering for tabular numeric data"
 readme = "README.md"
 requires-python = ">=3.9"
-license = "MIT"
+license = "Apache-2.0"
 authors = [
   { name = "Louis Ronald" }
 ]
@@ -16,7 +16,7 @@ keywords = ["heatmap", "visualization", "data-processing", "html"]
 classifiers = [
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3 :: Only",
-  "License :: OSI Approved :: MIT License",
+  "License :: OSI Approved :: Apache Software License",
   "Topic :: Scientific/Engineering :: Visualization",
   "Topic :: Software Development :: Libraries :: Python Modules",
 ]

@@ -70,7 +70,7 @@ experience
 ### 4.2 Metadata
 
 -   Name: `colorex`
--   License: MIT
+-   License: Apache-2.0
 -   Semantic Versioning (SemVer)
 -   Classifiers:
     -   Visualization
@@ -267,6 +267,6 @@ Run pytest - Build wheel
 ## 17. Ownership & Governance
 
 -   Louis Ronald retains project ownership
--   MIT License
+-   Apache License 2.0
 -   Public GitHub repository
 -   Accept pull requests after v1.0
