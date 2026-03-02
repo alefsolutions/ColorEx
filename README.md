@@ -127,6 +127,14 @@ pip install -e ".[dev,pandas,image]"
 pytest
 ```
 
+## Examples
+
+Runnable examples are in `examples/`:
+
+- `python examples/example1/run.py` (50x50 CSV dataset)
+- `python examples/example2/run.py` (in-memory data with missing values)
+- `python examples/example3/run.py` (CLI-driven rendering)
+
 ## License
 
 MIT. See [LICENSE.md](LICENSE.md).
