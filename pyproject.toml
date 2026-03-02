@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "colorex"
+version = "0.2.0"
+description = "Lightweight Python heatmap rendering for tabular numeric data"
+readme = "README.md"
+requires-python = ">=3.9"
+license = "MIT"
+authors = [
+  { name = "Louis Ronald" }
+]
+keywords = ["heatmap", "visualization", "data-processing", "html"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "License :: OSI Approved :: MIT License",
+  "Topic :: Scientific/Engineering :: Visualization",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = []
+
+[project.optional-dependencies]
+pandas = ["pandas>=2.0"]
+image = ["pillow>=10.0"]
+dev = [
+  "pytest>=8.0",
+  "ruff>=0.3",
+  "black>=24.0",
+]
+
+[project.scripts]
+colorex = "colorex.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["colorex*"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+
+[tool.black]
+line-length = 88
+target-version = ["py39"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py39"

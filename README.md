@@ -1,131 +1,131 @@
-![ColorEx](res/header.png)
-
 # ColorEx
 
-ColorEx is a Python heat map library centered around the `CX_HeatMap` engine in `colorexlib/colorex.py`.
+ColorEx is a lightweight Python library for rendering tabular numeric data into deterministic 2D heatmaps.
 
-## Current Features
-
-- 2D heat maps from numeric grid data.
-- CSV input support via `CSVReader`.
-- Output to:
-  - HTML file (`HTMLWriter`, Cheetah template rendering).
-  - Tkinter GUI window (`GUIOutputWriter`) with interactive tile selection and popup values.
-- Bi-color interpolation between theme `primary` and `secondary`.
-- Tile grouping (`TileGroup`, `TileGroups`) with:
-  - custom labels
-  - optional fixed colors per group
-  - fallback alpha-based group coloring
-- Optional numeric value formatting with `DataFormatter`.
-- Axis titles and labels.
-- Row/column header-aware rendering.
-- Theme and stylesheet customization using `Theme` and `StyleSheet`.
-
-## Requirements
-
-- Python 3.7+
-- `Cheetah3` (for HTML generation)
-- `tkinter` (for GUI output; usually bundled with Python)
-
-## Installation
+## Quickstart
 
 ```bash
-pip install colorexlib
+pip install colorex
 ```
-
-## Public API (Current)
-
-### Main engine
 
 ```python
-from colorexlib.colorex import CX_HeatMap
+from colorex import Heatmap
+
+hm = Heatmap(
+    [[1, 5, 2], [3, 9, 4], [6, 7, 8]],
+    title="Quickstart",
+    subtitle="Linear normalization",
+)
+hm.to_html("output.html")
 ```
 
-### `CX_HeatMap(options)` required options
-
-- `source`: one of
-  - CSV filepath `str` ending in `.csv`
-  - `DataGrid` instance
-- `title`: `str`
-- `subtitle`: `str`
-
-### `CX_HeatMap(options)` optional options
-
-- `theme`: `Theme` instance (default: `Theme()`)
-- `stylesheet`: `StyleSheet` instance (default: `StyleSheet()`)
-- `xaxis_title`: `str` (default: `""`)
-- `yaxis_title`: `str` (default: `""`)
-- `xaxis_labels`: `list` or `None`
-- `yaxis_labels`: `list` or `None`
-- `rowcol_headers`: `bool` (default: `True`)
-- `data_formatter`: `DataFormatter` or `None`
-- `grouping`: `TileGroups` or `None`
-
-### Output methods
-
-- `to_html(html_filename: str)`
-  - supported when `source` is a CSV filepath
-- `to_gui()`
-  - supported when `source` is CSV filepath or `DataGrid`
-
-## Minimal Working Example (CSV -> HTML)
+## DataFrame Example
 
 ```python
-from colorexlib.colorex import CX_HeatMap
-from colorexlib.common.styling import Theme
+import pandas as pd
+from colorex import Heatmap
 
-options = {
-    "source": "first_example/attendance.csv",
-    "title": "Student Attendance",
-    "subtitle": "Attendance by month",
-    "theme": Theme(
-        primaryColor="#d45500",
-        secondaryColor="#ffccaa",
-        onPrimaryColor="#ffccaa",
-        onSecondaryColor="#000000",
-    ),
-}
+# Requires: pip install "colorex[pandas]"
+df = pd.DataFrame(
+    [[10, 20, 30], [40, None, 60], [70, 80, 90]],
+    columns=["A", "B", "C"],
+    index=["r1", "r2", "r3"],
+)
 
-heatmap = CX_HeatMap(options)
-heatmap.to_html("attendance.html")
+hm = Heatmap(df, normalize="quantile", title="DataFrame Heatmap")
+hm.to_html("df_heatmap.html")
 ```
 
-## Minimal Working Example (CSV -> GUI)
+## CSV Example
 
 ```python
-from colorexlib.colorex import CX_HeatMap
-from colorexlib.common.styling import Theme
+from colorex import Heatmap
 
-options = {
-    "source": "first_example/attendance.csv",
-    "title": "Student Attendance",
-    "subtitle": "Attendance by month",
-    "theme": Theme(),
-}
-
-heatmap = CX_HeatMap(options)
-heatmap.to_gui()
+hm = Heatmap(
+    "input.csv",
+    normalize="log",
+    show_values=True,
+    title="CSV Heatmap",
+)
+hm.to_html("csv_heatmap.html")
+hm.to_image("csv_heatmap.png")
 ```
 
-## Core Modules
+## CLI Usage
 
-- `colorexlib/colorex.py`: `CX_HeatMap`
-- `colorexlib/common/datastructures.py`: `Data`, `DataGrid`, `Tile`, `HeatMap`, `TileGroup`, `TileGroups`
-- `colorexlib/common/styling.py`: `Themes`, `Theme`, `StyleSheet`
-- `colorexlib/common/formating.py`: `DataFormatter`
-- `colorexlib/readers/CSVReader.py`: CSV input reader
-- `colorexlib/writers/HTMLWriter.py`: HTML output writer
-- `colorexlib/writers/GUIOutputWriter.py`: Tkinter GUI writer
+```bash
+colorex render input.csv --out output.html --theme blue-red --normalize linear --show-values
+```
 
-## Notes About Repository State
+PNG output:
 
-- The current runnable class is `CX_HeatMap`.
-- HTML output uses an internal template string in `HTMLWriter`; there is no template filename argument in `to_html`.
-- Existing files in `examples/` and `first_example/` still show older API usage and do not match the current `CX_HeatMap` interface.
+```bash
+colorex render input.csv --out output.png --theme mono-dark --normalize quantile
+```
 
-## Contributing
+## Theme Customization
 
-See [CONTRIBUTING.md](CONTRIBUTING.md).
+Built-in themes:
+- `blue-red`
+- `green-yellow`
+- `mono-dark`
+- `mono-light`
+
+Use a built-in theme:
+
+```python
+from colorex import Heatmap
+
+hm = Heatmap([[1, 2], [3, 4]], theme="green-yellow")
+```
+
+Use a custom theme:
+
+```python
+from colorex import Heatmap, Theme
+
+custom = Theme(primary="#1D4ED8", secondary="#F59E0B", neutral="#E5E7EB")
+hm = Heatmap([[1, None], [3, 4]], theme=custom)
+```
+
+## API Reference
+
+### `Heatmap`
+
+```python
+Heatmap(
+    data,
+    theme=None,
+    normalize="linear",
+    show_values=False,
+    title=None,
+    subtitle=None,
+)
+```
+
+Accepted `data`:
+- `pandas.DataFrame`
+- 2D list of numeric values (`None` allowed)
+- CSV file path
+
+Behavior:
+- Missing values default to `None` and render using theme `neutral`.
+- Optional strict mode: `Heatmap(..., strict_missing=True)` raises on missing values.
+- Normalization modes: `linear`, `log`, `quantile`.
+
+Methods:
+- `to_html(path, legend=True) -> str`
+- `to_image(path) -> None` (requires Pillow)
+- `show() -> None` (opens image with system viewer; requires Pillow)
+
+## Development
+
+Install dev dependencies:
+
+```bash
+pip install -e ".[dev,pandas,image]"
+pytest
+```
 
 ## License
 
