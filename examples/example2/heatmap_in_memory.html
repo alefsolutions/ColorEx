@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ColorEx Heatmap</title>
+<style>
+:root { color-scheme: light; }
+* { box-sizing: border-box; }
+body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif; background: #f8fafc; color: #0f172a; }
+.cx-wrap { max-width: 1200px; margin: 0 auto; padding: 24px; }
+.cx-title { margin: 0 0 8px; font-size: 1.5rem; }
+.cx-subtitle { margin: 0 0 20px; color: #475569; }
+.cx-grid { display: inline-block; border: 1px solid #d0d7de; background: white; overflow: auto; max-width: 100%; }
+.cx-row { display: flex; }
+.cx-tile { width: 24px; height: 24px; border: 1px solid rgba(15,23,42,0.08); display: flex; align-items: center; justify-content: center; font-size: 10px; color: rgba(0,0,0,0.75); }
+.cx-tile:hover { outline: 2px solid #111827; outline-offset: -2px; }
+.cx-legend { display: flex; align-items: center; gap: 12px; margin-top: 16px; }
+.cx-legend-label { font-size: 0.875rem; color: #334155; }
+.cx-legend-bar { width: 240px; max-width: 50vw; height: 12px; border-radius: 999px; border: 1px solid rgba(15,23,42,0.12); }
+@media (max-width: 640px) { .cx-tile { width: 18px; height: 18px; font-size: 8px; } }
+</style>
+</head>
+<body>
+<div class="cx-wrap">
+<h1 class="cx-title">Example 2: In-Memory Data</h1>
+<p class="cx-subtitle">Quantile normalization with missing values</p>
+<div class="cx-grid" role="grid">
+<div class="cx-row" role="row">
+<div class="cx-tile" role="gridcell" style="background:#E5E7EB" title="row 1, col 1: missing"></div>
+<div class="cx-tile" role="gridcell" style="background:#f49d0b" title="row 1, col 2: 2.3"></div>
+<div class="cx-tile" role="gridcell" style="background:#f29d0d" title="row 1, col 3: 4.6"></div>
+<div class="cx-tile" role="gridcell" style="background:#ef9c10" title="row 1, col 4: 6.9"></div>
+<div class="cx-tile" role="gridcell" style="background:#ec9a13" title="row 1, col 5: 9.2"></div>
+<div class="cx-tile" role="gridcell" style="background:#e79917" title="row 1, col 6: 11.5"></div>
+<div class="cx-tile" role="gridcell" style="background:#e2971c" title="row 1, col 7: 13.8"></div>
+<div class="cx-tile" role="gridcell" style="background:#dc9422" title="row 1, col 8: 16.1"></div>
+<div class="cx-tile" role="gridcell" style="background:#d69228" title="row 1, col 9: 18.4"></div>
+<div class="cx-tile" role="gridcell" style="background:#d0902d" title="row 1, col 10: 20.7"></div>
+<div class="cx-tile" role="gridcell" style="background:#ca8e33" title="row 1, col 11: 23"></div>
+<div class="cx-tile" role="gridcell" style="background:#E5E7EB" title="row 1, col 12: missing"></div>
+<div class="cx-tile" role="gridcell" style="background:#ba8842" title="row 1, col 13: 27.6"></div>
+<div class="cx-tile" role="gridcell" style="background:#af844d" title="row 1, col 14: 29.9"></div>
+<div class="cx-tile" role="gridcell" style="background:#a48057" title="row 1, col 15: 32.2"></div>
+<div class="cx-tile" role="gridcell" style="background:#987b63" title="row 1, col 16: 34.5"></div>
+<div class="cx-tile" role="gridcell" style="background:#8c776e" title="row 1, col 17: 36.8"></div>
+<div class="cx-tile" role="gridcell" style="background:#807279" title="row 1, col 18: 39.1"></div>
+<div class="cx-tile" role="gridcell" style="background:#766f82" title="row 1, col 19: 41.4"></div>
+<div class="cx-tile" role="gridcell" style="background:#6d6b8b" title="row 1, col 20: 43.7"></div>
+</div>
+<div class="cx-row" role="row">
+<div class="cx-tile" role="gridcell" style="background:#f59e0b" title="row 2, col 1: 1.7"></div>
+<div class="cx-tile" role="gridcell" style="background:#f39d0c" title="row 2, col 2: 4"></div>
+<div class="cx-tile" role="gridcell" style="background:#f09c0e" title="row 2, col 3: 6.3"></div>
+<div class="cx-tile" role="gridcell" style="background:#ed9b12" title="row 2, col 4: 8.6"></div>
+<div class="cx-tile" role="gridcell" style="background:#e99916" title="row 2, col 5: 10.9"></div>
+<div class="cx-tile" role="gridcell" style="background:#e4971a" title="row 2, col 6: 13.2"></div>
+<div class="cx-tile" role="gridcell" style="background:#de9520" title="row 2, col 7: 15.5"></div>
+<div class="cx-tile" role="gridcell" style="background:#d79326" title="row 2, col 8: 17.8"></div>
+<div class="cx-tile" role="gridcell" style="background:#d2912b" title="row 2, col 9: 20.1"></div>
+<div class="cx-tile" role="gridcell" style="background:#cc8f31" title="row 2, col 10: 22.4"></div>
+<div class="cx-tile" role="gridcell" style="background:#E5E7EB" title="row 2, col 11: missing"></div>
+<div class="cx-tile" role="gridcell" style="background:#bd8940" title="row 2, col 12: 27"></div>
+<div class="cx-tile" role="gridcell" style="background:#b2854a" title="row 2, col 13: 29.3"></div>
+<div class="cx-tile" role="gridcell" style="background:#a78154" title="row 2, col 14: 31.6"></div>
+<div class="cx-tile" role="gridcell" style="background:#9b7c60" title="row 2, col 15: 33.9"></div>
+<div class="cx-tile" role="gridcell" style="background:#8f786b" title="row 2, col 16: 36.2"></div>
+<div class="cx-tile" role="gridcell" style="background:#837376" title="row 2, col 17: 38.5"></div>
+<div class="cx-tile" role="gridcell" style="background:#797080" title="row 2, col 18: 40.8"></div>
+<div class="cx-tile" role="gridcell" style="background:#6f6c89" title="row 2, col 19: 43.1"></div>
+<div class="cx-tile" role="gridcell" style="background:#666992" title="row 2, col 20: 45.4"></div>
+</div>
+<div class="cx-row" role="row">
+<div class="cx-tile" role="gridcell" style="background:#f39d0c" title="row 3, col 1: 3.4"></div>
+<div class="cx-tile" role="gridcell" style="background:#f19c0e" title="row 3, col 2: 5.7"></div>
+<div class="cx-tile" role="gridcell" style="background:#ee9b11" title="row 3, col 3: 8"></div>
+<div class="cx-tile" role="gridcell" style="background:#ea9a15" title="row 3, col 4: 10.3"></div>
+<div class="cx-tile" role="gridcell" style="background:#e59819" title="row 3, col 5: 12.6"></div>
+<div class="cx-tile" role="gridcell" style="background:#e0961e" title="row 3, col 6: 14.9"></div>
+<div class="cx-tile" role="gridcell" style="background:#d99324" title="row 3, col 7: 17.2"></div>
+<div class="cx-tile" role="gridcell" style="background:#d3912a" title="row 3, col 8: 19.5"></div>
+<div class="cx-tile" role="gridcell" style="background:#ce8f2f" title="row 3, col 9: 21.8"></div>
+<div class="cx-tile" role="gridcell" style="background:#E5E7EB" title="row 3, col 10: missing"></div>
+<div class="cx-tile" role="gridcell" style="background:#bf8a3d" title="row 3, col 11: 26.4"></div>
+<div class="cx-tile" role="gridcell" style="background:#b58647" title="row 3, col 12: 28.7"></div>
+<div class="cx-tile" role="gridcell" style="background:#aa8252" title="row 3, col 13: 31"></div>
+<div class="cx-tile" role="gridcell" style="background:#9e7d5d" title="row 3, col 14: 33.3"></div>
+<div class="cx-tile" role="gridcell" style="background:#927968" title="row 3, col 15: 35.6"></div>
+<div class="cx-tile" role="gridcell" style="background:#867574" title="row 3, col 16: 37.9"></div>
+<div class="cx-tile" role="gridcell" style="background:#7b717e" title="row 3, col 17: 40.2"></div>
+<div class="cx-tile" role="gridcell" style="background:#726d87" title="row 3, col 18: 42.5"></div>
+<div class="cx-tile" role="gridcell" style="background:#686990" title="row 3, col 19: 44.8"></div>
+<div class="cx-tile" role="gridcell" style="background:#5f6698" title="row 3, col 20: 47.1"></div>
+</div>
+<div class="cx-row" role="row">
+<div class="cx-tile" role="gridcell" style="background:#f29c0d" title="row 4, col 1: 5.1"></div>
+<div class="cx-tile" role="gridcell" style="background:#ef9b10" title="row 4, col 2: 7.4"></div>
+<div class="cx-tile" role="gridcell" style="background:#eb9a14" title="row 4, col 3: 9.7"></div>
+<div class="cx-tile" role="gridcell" style="background:#e69818" title="row 4, col 4: 12"></div>
+<div class="cx-tile" role="gridcell" style="background:#e1961d" title="row 4, col 5: 14.3"></div>
+<div class="cx-tile" role="gridcell" style="background:#db9423" title="row 4, col 6: 16.6"></div>
+<div class="cx-tile" role="gridcell" style="background:#d49229" title="row 4, col 7: 18.9"></div>
+<div class="cx-tile" role="gridcell" style="background:#cf902e" title="row 4, col 8: 21.2"></div>
+<div class="cx-tile" role="gridcell" style="background:#E5E7EB" title="row 4, col 9: missing"></div>
+<div class="cx-tile" role="gridcell" style="background:#c18b3b" title="row 4, col 10: 25.8"></div>
+<div class="cx-tile" role="gridcell" style="background:#b78745" title="row 4, col 11: 28.1"></div>
+<div class="cx-tile" role="gridcell" style="background:#ad834f" title="row 4, col 12: 30.4"></div>
+<div class="cx-tile" role="gridcell" style="background:#a17e5a" title="row 4, col 13: 32.7"></div>
+<div class="cx-tile" role="gridcell" style="background:#957a65" title="row 4, col 14: 35"></div>
+<div class="cx-tile" role="gridcell" style="background:#897671" title="row 4, col 15: 37.3"></div>
+<div class="cx-tile" role="gridcell" style="background:#7d717b" title="row 4, col 16: 39.6"></div>
+<div class="cx-tile" role="gridcell" style="background:#746e84" title="row 4, col 17: 41.9"></div>
+<div class="cx-tile" role="gridcell" style="background:#6a6a8e" title="row 4, col 18: 44.2"></div>
+<div class="cx-tile" role="gridcell" style="background:#626796" title="row 4, col 19: 46.5"></div>
+<div class="cx-tile" role="gridcell" style="background:#E5E7EB" title="row 4, col 20: missing"></div>
+</div>
+<div class="cx-row" role="row">
+<div class="cx-tile" role="gridcell" style="background:#f09c0f" title="row 5, col 1: 6.8"></div>
+<div class="cx-tile" role="gridcell" style="background:#ec9a12" title="row 5, col 2: 9.1"></div>
+<div class="cx-tile" role="gridcell" style="background:#e89916" title="row 5, col 3: 11.4"></div>
+<div class="cx-tile" role="gridcell" style="background:#e3971b" title="row 5, col 4: 13.7"></div>
+<div class="cx-tile" role="gridcell" style="background:#dd9521" title="row 5, col 5: 16"></div>
+<div class="cx-tile" role="gridcell" style="background:#d69227" title="row 5, col 6: 18.3"></div>
+<div class="cx-tile" role="gridcell" style="background:#d1902c" title="row 5, col 7: 20.6"></div>
+<div class="cx-tile" role="gridcell" style="background:#E5E7EB" title="row 5, col 8: missing"></div>
+<div class="cx-tile" role="gridcell" style="background:#c48b39" title="row 5, col 9: 25.2"></div>
+<div class="cx-tile" role="gridcell" style="background:#ba8842" title="row 5, col 10: 27.5"></div>
+<div class="cx-tile" role="gridcell" style="background:#af844c" title="row 5, col 11: 29.8"></div>
+<div class="cx-tile" role="gridcell" style="background:#a48057" title="row 5, col 12: 32.1"></div>
+<div class="cx-tile" role="gridcell" style="background:#987b62" title="row 5, col 13: 34.4"></div>
+<div class="cx-tile" role="gridcell" style="background:#8c776d" title="row 5, col 14: 36.7"></div>
+<div class="cx-tile" role="gridcell" style="background:#807379" title="row 5, col 15: 39"></div>
+<div class="cx-tile" role="gridcell" style="background:#776f82" title="row 5, col 16: 41.3"></div>
+<div class="cx-tile" role="gridcell" style="background:#6d6b8b" title="row 5, col 17: 43.6"></div>
+<div class="cx-tile" role="gridcell" style="background:#646894" title="row 5, col 18: 45.9"></div>
+<div class="cx-tile" role="gridcell" style="background:#E5E7EB" title="row 5, col 19: missing"></div>
+<div class="cx-tile" role="gridcell" style="background:#5261a5" title="row 5, col 20: 50.5"></div>
+</div>
+<div class="cx-row" role="row">
+<div class="cx-tile" role="gridcell" style="background:#ed9b11" title="row 6, col 1: 8.5"></div>
+<div class="cx-tile" role="gridcell" style="background:#e99915" title="row 6, col 2: 10.8"></div>
+<div class="cx-tile" role="gridcell" style="background:#e4981a" title="row 6, col 3: 13.1"></div>
+<div class="cx-tile" role="gridcell" style="background:#de951f" title="row 6, col 4: 15.4"></div>
+<div class="cx-tile" role="gridcell" style="background:#d89326" title="row 6, col 5: 17.7"></div>
+<div class="cx-tile" role="gridcell" style="background:#d3912b" title="row 6, col 6: 20"></div>
+<div class="cx-tile" role="gridcell" style="background:#E5E7EB" title="row 6, col 7: missing"></div>
+<div class="cx-tile" role="gridcell" style="background:#c58c37" title="row 6, col 8: 24.6"></div>
+<div class="cx-tile" role="gridcell" style="background:#bd893f" title="row 6, col 9: 26.9"></div>
+<div class="cx-tile" role="gridcell" style="background:#b28549" title="row 6, col 10: 29.2"></div>
+<div class="cx-tile" role="gridcell" style="background:#a78154" title="row 6, col 11: 31.5"></div>
+<div class="cx-tile" role="gridcell" style="background:#9b7c5f" title="row 6, col 12: 33.8"></div>
+<div class="cx-tile" role="gridcell" style="background:#8f786b" title="row 6, col 13: 36.1"></div>
+<div class="cx-tile" role="gridcell" style="background:#837476" title="row 6, col 14: 38.4"></div>
+<div class="cx-tile" role="gridcell" style="background:#79707f" title="row 6, col 15: 40.7"></div>
+<div class="cx-tile" role="gridcell" style="background:#706c88" title="row 6, col 16: 43"></div>
+<div class="cx-tile" role="gridcell" style="background:#666991" title="row 6, col 17: 45.3"></div>
+<div class="cx-tile" role="gridcell" style="background:#E5E7EB" title="row 6, col 18: missing"></div>
+<div class="cx-tile" role="gridcell" style="background:#5462a2" title="row 6, col 19: 49.9"></div>
+<div class="cx-tile" role="gridcell" style="background:#4b5fab" title="row 6, col 20: 52.2"></div>
+</div>
+<div class="cx-row" role="row">
+<div class="cx-tile" role="gridcell" style="background:#ea9a14" title="row 7, col 1: 10.2"></div>
+<div class="cx-tile" role="gridcell" style="background:#e69819" title="row 7, col 2: 12.5"></div>
+<div class="cx-tile" role="gridcell" style="background:#e0961e" title="row 7, col 3: 14.8"></div>
+<div class="cx-tile" role="gridcell" style="background:#da9424" title="row 7, col 4: 17.1"></div>
+<div class="cx-tile" role="gridcell" style="background:#d4912a" title="row 7, col 5: 19.4"></div>
+<div class="cx-tile" role="gridcell" style="background:#E5E7EB" title="row 7, col 6: missing"></div>
+<div class="cx-tile" role="gridcell" style="background:#c78d35" title="row 7, col 7: 24"></div>
+<div class="cx-tile" role="gridcell" style="background:#c08a3d" title="row 7, col 8: 26.3"></div>
+<div class="cx-tile" role="gridcell" style="background:#b58646" title="row 7, col 9: 28.6"></div>
+<div class="cx-tile" role="gridcell" style="background:#aa8251" title="row 7, col 10: 30.9"></div>
+<div class="cx-tile" role="gridcell" style="background:#9e7e5c" title="row 7, col 11: 33.2"></div>
+<div class="cx-tile" role="gridcell" style="background:#927968" title="row 7, col 12: 35.5"></div>
+<div class="cx-tile" role="gridcell" style="background:#867573" title="row 7, col 13: 37.8"></div>
+<div class="cx-tile" role="gridcell" style="background:#7c717d" title="row 7, col 14: 40.1"></div>
+<div class="cx-tile" role="gridcell" style="background:#726d86" title="row 7, col 15: 42.4"></div>
+<div class="cx-tile" role="gridcell" style="background:#696a8f" title="row 7, col 16: 44.7"></div>
+<div class="cx-tile" role="gridcell" style="background:#E5E7EB" title="row 7, col 17: missing"></div>
+<div class="cx-tile" role="gridcell" style="background:#5763a0" title="row 7, col 18: 49.3"></div>
+<div class="cx-tile" role="gridcell" style="background:#4d60a9" title="row 7, col 19: 51.6"></div>
+<div class="cx-tile" role="gridcell" style="background:#445cb2" title="row 7, col 20: 53.9"></div>
+</div>
+<div class="cx-row" role="row">
+<div class="cx-tile" role="gridcell" style="background:#e79817" title="row 8, col 1: 11.9"></div>
+<div class="cx-tile" role="gridcell" style="background:#e1961d" title="row 8, col 2: 14.2"></div>
+<div class="cx-tile" role="gridcell" style="background:#dc9422" title="row 8, col 3: 16.5"></div>
+<div class="cx-tile" role="gridcell" style="background:#d59228" title="row 8, col 4: 18.8"></div>
+<div class="cx-tile" role="gridcell" style="background:#E5E7EB" title="row 8, col 5: missing"></div>
+<div class="cx-tile" role="gridcell" style="background:#c98d34" title="row 8, col 6: 23.4"></div>
+<div class="cx-tile" role="gridcell" style="background:#c28b3b" title="row 8, col 7: 25.7"></div>
+<div class="cx-tile" role="gridcell" style="background:#b88744" title="row 8, col 8: 28"></div>
+<div class="cx-tile" role="gridcell" style="background:#ad834e" title="row 8, col 9: 30.3"></div>
+<div class="cx-tile" role="gridcell" style="background:#a17f5a" title="row 8, col 10: 32.6"></div>
+<div class="cx-tile" role="gridcell" style="background:#957a65" title="row 8, col 11: 34.9"></div>
+<div class="cx-tile" role="gridcell" style="background:#897670" title="row 8, col 12: 37.2"></div>
+<div class="cx-tile" role="gridcell" style="background:#7e727b" title="row 8, col 13: 39.5"></div>
+<div class="cx-tile" role="gridcell" style="background:#756e84" title="row 8, col 14: 41.8"></div>
+<div class="cx-tile" role="gridcell" style="background:#6b6b8d" title="row 8, col 15: 44.1"></div>
+<div class="cx-tile" role="gridcell" style="background:#E5E7EB" title="row 8, col 16: missing"></div>
+<div class="cx-tile" role="gridcell" style="background:#59649e" title="row 8, col 17: 48.7"></div>
+<div class="cx-tile" role="gridcell" style="background:#5060a7" title="row 8, col 18: 51"></div>
+<div class="cx-tile" role="gridcell" style="background:#475daf" title="row 8, col 19: 53.3"></div>
+<div class="cx-tile" role="gridcell" style="background:#3e5ab7" title="row 8, col 20: 55.6"></div>
+</div>
+<div class="cx-row" role="row">
+<div class="cx-tile" role="gridcell" style="background:#e3971b" title="row 9, col 1: 13.6"></div>
+<div class="cx-tile" role="gridcell" style="background:#dd9521" title="row 9, col 2: 15.9"></div>
+<div class="cx-tile" role="gridcell" style="background:#d79227" title="row 9, col 3: 18.2"></div>
+<div class="cx-tile" role="gridcell" style="background:#E5E7EB" title="row 9, col 4: missing"></div>
+<div class="cx-tile" role="gridcell" style="background:#cb8e32" title="row 9, col 5: 22.8"></div>
+<div class="cx-tile" role="gridcell" style="background:#c48c38" title="row 9, col 6: 25.1"></div>
+<div class="cx-tile" role="gridcell" style="background:#bb8841" title="row 9, col 7: 27.4"></div>
+<div class="cx-tile" role="gridcell" style="background:#b0844b" title="row 9, col 8: 29.7"></div>
+<div class="cx-tile" role="gridcell" style="background:#a58056" title="row 9, col 9: 32"></div>
+<div class="cx-tile" role="gridcell" style="background:#997c61" title="row 9, col 10: 34.3"></div>
+<div class="cx-tile" role="gridcell" style="background:#8d776d" title="row 9, col 11: 36.6"></div>
+<div class="cx-tile" role="gridcell" style="background:#817378" title="row 9, col 12: 38.9"></div>
+<div class="cx-tile" role="gridcell" style="background:#786f81" title="row 9, col 13: 41.2"></div>
+<div class="cx-tile" role="gridcell" style="background:#6e6c8a" title="row 9, col 14: 43.5"></div>
+<div class="cx-tile" role="gridcell" style="background:#E5E7EB" title="row 9, col 15: missing"></div>
+<div class="cx-tile" role="gridcell" style="background:#5c659c" title="row 9, col 16: 48.1"></div>
+<div class="cx-tile" role="gridcell" style="background:#5362a4" title="row 9, col 17: 50.4"></div>
+<div class="cx-tile" role="gridcell" style="background:#495ead" title="row 9, col 18: 52.7"></div>
+<div class="cx-tile" role="gridcell" style="background:#415bb5" title="row 9, col 19: 55"></div>
+<div class="cx-tile" role="gridcell" style="background:#3958bc" title="row 9, col 20: 57.3"></div>
+</div>
+<div class="cx-row" role="row">
+<div class="cx-tile" role="gridcell" style="background:#df961f" title="row 10, col 1: 15.3"></div>
+<div class="cx-tile" role="gridcell" style="background:#d99325" title="row 10, col 2: 17.6"></div>
+<div class="cx-tile" role="gridcell" style="background:#E5E7EB" title="row 10, col 3: missing"></div>
+<div class="cx-tile" role="gridcell" style="background:#cd8f30" title="row 10, col 4: 22.2"></div>
+<div class="cx-tile" role="gridcell" style="background:#c68c37" title="row 10, col 5: 24.5"></div>
+<div class="cx-tile" role="gridcell" style="background:#be893e" title="row 10, col 6: 26.8"></div>
+<div class="cx-tile" role="gridcell" style="background:#b38549" title="row 10, col 7: 29.1"></div>
+<div class="cx-tile" role="gridcell" style="background:#a88153" title="row 10, col 8: 31.4"></div>
+<div class="cx-tile" role="gridcell" style="background:#9c7d5f" title="row 10, col 9: 33.7"></div>
+<div class="cx-tile" role="gridcell" style="background:#90786a" title="row 10, col 10: 36"></div>
+<div class="cx-tile" role="gridcell" style="background:#847475" title="row 10, col 11: 38.3"></div>
+<div class="cx-tile" role="gridcell" style="background:#7a707f" title="row 10, col 12: 40.6"></div>
+<div class="cx-tile" role="gridcell" style="background:#706d88" title="row 10, col 13: 42.9"></div>
+<div class="cx-tile" role="gridcell" style="background:#E5E7EB" title="row 10, col 14: missing"></div>
+<div class="cx-tile" role="gridcell" style="background:#5d669a" title="row 10, col 15: 47.5"></div>
+<div class="cx-tile" role="gridcell" style="background:#5562a2" title="row 10, col 16: 49.8"></div>
+<div class="cx-tile" role="gridcell" style="background:#4c5fab" title="row 10, col 17: 52.1"></div>
+<div class="cx-tile" role="gridcell" style="background:#435cb3" title="row 10, col 18: 54.4"></div>
+<div class="cx-tile" role="gridcell" style="background:#3b59bb" title="row 10, col 19: 56.7"></div>
+<div class="cx-tile" role="gridcell" style="background:#3456c1" title="row 10, col 20: 59"></div>
+</div>
+<div class="cx-row" role="row">
+<div class="cx-tile" role="gridcell" style="background:#da9423" title="row 11, col 1: 17"></div>
+<div class="cx-tile" role="gridcell" style="background:#E5E7EB" title="row 11, col 2: missing"></div>
+<div class="cx-tile" role="gridcell" style="background:#ce8f2f" title="row 11, col 3: 21.6"></div>
+<div class="cx-tile" role="gridcell" style="background:#c88d35" title="row 11, col 4: 23.9"></div>
+<div class="cx-tile" role="gridcell" style="background:#c08a3c" title="row 11, col 5: 26.2"></div>
+<div class="cx-tile" role="gridcell" style="background:#b68646" title="row 11, col 6: 28.5"></div>
+<div class="cx-tile" role="gridcell" style="background:#ab8251" title="row 11, col 7: 30.8"></div>
+<div class="cx-tile" role="gridcell" style="background:#9f7e5c" title="row 11, col 8: 33.1"></div>
+<div class="cx-tile" role="gridcell" style="background:#937967" title="row 11, col 9: 35.4"></div>
+<div class="cx-tile" role="gridcell" style="background:#877572" title="row 11, col 10: 37.7"></div>
+<div class="cx-tile" role="gridcell" style="background:#7c717d" title="row 11, col 11: 40"></div>
+<div class="cx-tile" role="gridcell" style="background:#736d86" title="row 11, col 12: 42.3"></div>
+<div class="cx-tile" role="gridcell" style="background:#E5E7EB" title="row 11, col 13: missing"></div>
+<div class="cx-tile" role="gridcell" style="background:#606698" title="row 11, col 14: 46.9"></div>
+<div class="cx-tile" role="gridcell" style="background:#5763a0" title="row 11, col 15: 49.2"></div>
+<div class="cx-tile" role="gridcell" style="background:#4e60a9" title="row 11, col 16: 51.5"></div>
+<div class="cx-tile" role="gridcell" style="background:#455cb1" title="row 11, col 17: 53.8"></div>
+<div class="cx-tile" role="gridcell" style="background:#3d59b9" title="row 11, col 18: 56.1"></div>
+<div class="cx-tile" role="gridcell" style="background:#3557c0" title="row 11, col 19: 58.4"></div>
+<div class="cx-tile" role="gridcell" style="background:#2f54c6" title="row 11, col 20: 60.7"></div>
+</div>
+<div class="cx-row" role="row">
+<div class="cx-tile" role="gridcell" style="background:#E5E7EB" title="row 12, col 1: missing"></div>
+<div class="cx-tile" role="gridcell" style="background:#d0902e" title="row 12, col 2: 21"></div>
+<div class="cx-tile" role="gridcell" style="background:#ca8e33" title="row 12, col 3: 23.3"></div>
+<div class="cx-tile" role="gridcell" style="background:#c38b3a" title="row 12, col 4: 25.6"></div>
+<div class="cx-tile" role="gridcell" style="background:#b88744" title="row 12, col 5: 27.9"></div>
+<div class="cx-tile" role="gridcell" style="background:#ae834e" title="row 12, col 6: 30.2"></div>
+<div class="cx-tile" role="gridcell" style="background:#a27f59" title="row 12, col 7: 32.5"></div>
+<div class="cx-tile" role="gridcell" style="background:#967a64" title="row 12, col 8: 34.8"></div>
+<div class="cx-tile" role="gridcell" style="background:#8a7670" title="row 12, col 9: 37.1"></div>
+<div class="cx-tile" role="gridcell" style="background:#7f727a" title="row 12, col 10: 39.4"></div>
+<div class="cx-tile" role="gridcell" style="background:#756e83" title="row 12, col 11: 41.7"></div>
+<div class="cx-tile" role="gridcell" style="background:#E5E7EB" title="row 12, col 12: missing"></div>
+<div class="cx-tile" role="gridcell" style="background:#626795" title="row 12, col 13: 46.3"></div>
+<div class="cx-tile" role="gridcell" style="background:#5a649d" title="row 12, col 14: 48.6"></div>
+<div class="cx-tile" role="gridcell" style="background:#5061a6" title="row 12, col 15: 50.9"></div>
+<div class="cx-tile" role="gridcell" style="background:#475daf" title="row 12, col 16: 53.2"></div>
+<div class="cx-tile" role="gridcell" style="background:#3f5ab7" title="row 12, col 17: 55.5"></div>
+<div class="cx-tile" role="gridcell" style="background:#3757be" title="row 12, col 18: 57.8"></div>
+<div class="cx-tile" role="gridcell" style="background:#3155c4" title="row 12, col 19: 60.1"></div>
+<div class="cx-tile" role="gridcell" style="background:#2b53ca" title="row 12, col 20: 62.4"></div>
+</div>
+<div class="cx-row" role="row">
+<div class="cx-tile" role="gridcell" style="background:#d1902c" title="row 13, col 1: 20.4"></div>
+<div class="cx-tile" role="gridcell" style="background:#cb8e31" title="row 13, col 2: 22.7"></div>
+<div class="cx-tile" role="gridcell" style="background:#c58c38" title="row 13, col 3: 25"></div>
+<div class="cx-tile" role="gridcell" style="background:#bb8841" title="row 13, col 4: 27.3"></div>
+<div class="cx-tile" role="gridcell" style="background:#b1844b" title="row 13, col 5: 29.6"></div>
+<div class="cx-tile" role="gridcell" style="background:#a58056" title="row 13, col 6: 31.9"></div>
+<div class="cx-tile" role="gridcell" style="background:#997c61" title="row 13, col 7: 34.2"></div>
+<div class="cx-tile" role="gridcell" style="background:#8e776c" title="row 13, col 8: 36.5"></div>
+<div class="cx-tile" role="gridcell" style="background:#827377" title="row 13, col 9: 38.8"></div>
+<div class="cx-tile" role="gridcell" style="background:#786f81" title="row 13, col 10: 41.1"></div>
+<div class="cx-tile" role="gridcell" style="background:#E5E7EB" title="row 13, col 11: missing"></div>
+<div class="cx-tile" role="gridcell" style="background:#656893" title="row 13, col 12: 45.7"></div>
+<div class="cx-tile" role="gridcell" style="background:#5c659b" title="row 13, col 13: 48"></div>
+<div class="cx-tile" role="gridcell" style="background:#5362a4" title="row 13, col 14: 50.3"></div>
+<div class="cx-tile" role="gridcell" style="background:#4a5ead" title="row 13, col 15: 52.6"></div>
+<div class="cx-tile" role="gridcell" style="background:#415bb4" title="row 13, col 16: 54.9"></div>
+<div class="cx-tile" role="gridcell" style="background:#3a58bc" title="row 13, col 17: 57.2"></div>
+<div class="cx-tile" role="gridcell" style="background:#3356c3" title="row 13, col 18: 59.5"></div>
+<div class="cx-tile" role="gridcell" style="background:#2d53c8" title="row 13, col 19: 61.8"></div>
+<div class="cx-tile" role="gridcell" style="background:#2751cd" title="row 13, col 20: 64.1"></div>
+</div>
+<div class="cx-row" role="row">
+<div class="cx-tile" role="gridcell" style="background:#cd8f30" title="row 14, col 1: 22.1"></div>
+<div class="cx-tile" role="gridcell" style="background:#c78d36" title="row 14, col 2: 24.4"></div>
+<div class="cx-tile" role="gridcell" style="background:#be893e" title="row 14, col 3: 26.7"></div>
+<div class="cx-tile" role="gridcell" style="background:#b48548" title="row 14, col 4: 29"></div>
+<div class="cx-tile" role="gridcell" style="background:#a88153" title="row 14, col 5: 31.3"></div>
+<div class="cx-tile" role="gridcell" style="background:#9c7d5e" title="row 14, col 6: 33.6"></div>
+<div class="cx-tile" role="gridcell" style="background:#917869" title="row 14, col 7: 35.9"></div>
+<div class="cx-tile" role="gridcell" style="background:#857475" title="row 14, col 8: 38.2"></div>
+<div class="cx-tile" role="gridcell" style="background:#7b707e" title="row 14, col 9: 40.5"></div>
+<div class="cx-tile" role="gridcell" style="background:#E5E7EB" title="row 14, col 10: missing"></div>
+<div class="cx-tile" role="gridcell" style="background:#676991" title="row 14, col 11: 45.1"></div>
+<div class="cx-tile" role="gridcell" style="background:#5e6699" title="row 14, col 12: 47.4"></div>
+<div class="cx-tile" role="gridcell" style="background:#5663a1" title="row 14, col 13: 49.7"></div>
+<div class="cx-tile" role="gridcell" style="background:#4c5faa" title="row 14, col 14: 52"></div>
+<div class="cx-tile" role="gridcell" style="background:#435cb3" title="row 14, col 15: 54.3"></div>
+<div class="cx-tile" role="gridcell" style="background:#3b59ba" title="row 14, col 16: 56.6"></div>
+<div class="cx-tile" role="gridcell" style="background:#3456c1" title="row 14, col 17: 58.9"></div>
+<div class="cx-tile" role="gridcell" style="background:#2e54c7" title="row 14, col 18: 61.2"></div>
+<div class="cx-tile" role="gridcell" style="background:#2852cc" title="row 14, col 19: 63.5"></div>
+<div class="cx-tile" role="gridcell" style="background:#2551cf" title="row 14, col 20: 65.8"></div>
+</div>
+<div class="cx-row" role="row">
+<div class="cx-tile" role="gridcell" style="background:#c88d34" title="row 15, col 1: 23.8"></div>
+<div class="cx-tile" role="gridcell" style="background:#c18a3c" title="row 15, col 2: 26.1"></div>
+<div class="cx-tile" role="gridcell" style="background:#b78745" title="row 15, col 3: 28.4"></div>
+<div class="cx-tile" role="gridcell" style="background:#ab8250" title="row 15, col 4: 30.7"></div>
+<div class="cx-tile" role="gridcell" style="background:#9f7e5b" title="row 15, col 5: 33"></div>
+<div class="cx-tile" role="gridcell" style="background:#947a67" title="row 15, col 6: 35.3"></div>
+<div class="cx-tile" role="gridcell" style="background:#887572" title="row 15, col 7: 37.6"></div>
+<div class="cx-tile" role="gridcell" style="background:#7d717c" title="row 15, col 8: 39.9"></div>
+<div class="cx-tile" role="gridcell" style="background:#E5E7EB" title="row 15, col 9: missing"></div>
+<div class="cx-tile" role="gridcell" style="background:#696a8f" title="row 15, col 10: 44.5"></div>
+<div class="cx-tile" role="gridcell" style="background:#606797" title="row 15, col 11: 46.8"></div>
+<div class="cx-tile" role="gridcell" style="background:#58649f" title="row 15, col 12: 49.1"></div>
+<div class="cx-tile" role="gridcell" style="background:#4e60a8" title="row 15, col 13: 51.4"></div>
+<div class="cx-tile" role="gridcell" style="background:#465db1" title="row 15, col 14: 53.7"></div>
+<div class="cx-tile" role="gridcell" style="background:#3d5ab8" title="row 15, col 15: 56"></div>
+<div class="cx-tile" role="gridcell" style="background:#3657bf" title="row 15, col 16: 58.3"></div>
+<div class="cx-tile" role="gridcell" style="background:#3055c5" title="row 15, col 17: 60.6"></div>
+<div class="cx-tile" role="gridcell" style="background:#2a52cb" title="row 15, col 18: 62.9"></div>
+<div class="cx-tile" role="gridcell" style="background:#2651ce" title="row 15, col 19: 65.2"></div>
+<div class="cx-tile" role="gridcell" style="background:#E5E7EB" title="row 15, col 20: missing"></div>
+</div>
+<div class="cx-row" role="row">
+<div class="cx-tile" role="gridcell" style="background:#c38b39" title="row 16, col 1: 25.5"></div>
+<div class="cx-tile" role="gridcell" style="background:#b98743" title="row 16, col 2: 27.8"></div>
+<div class="cx-tile" role="gridcell" style="background:#ae834d" title="row 16, col 3: 30.1"></div>
+<div class="cx-tile" role="gridcell" style="background:#a27f58" title="row 16, col 4: 32.4"></div>
+<div class="cx-tile" role="gridcell" style="background:#967b64" title="row 16, col 5: 34.7"></div>
+<div class="cx-tile" role="gridcell" style="background:#8b766f" title="row 16, col 6: 37"></div>
+<div class="cx-tile" role="gridcell" style="background:#7f727a" title="row 16, col 7: 39.3"></div>
+<div class="cx-tile" role="gridcell" style="background:#E5E7EB" title="row 16, col 8: missing"></div>
+<div class="cx-tile" role="gridcell" style="background:#6c6b8c" title="row 16, col 9: 43.9"></div>
+<div class="cx-tile" role="gridcell" style="background:#636895" title="row 16, col 10: 46.2"></div>
+<div class="cx-tile" role="gridcell" style="background:#5a649d" title="row 16, col 11: 48.5"></div>
+<div class="cx-tile" role="gridcell" style="background:#5161a6" title="row 16, col 12: 50.8"></div>
+<div class="cx-tile" role="gridcell" style="background:#485eae" title="row 16, col 13: 53.1"></div>
+<div class="cx-tile" role="gridcell" style="background:#405bb6" title="row 16, col 14: 55.4"></div>
+<div class="cx-tile" role="gridcell" style="background:#3858be" title="row 16, col 15: 57.7"></div>
+<div class="cx-tile" role="gridcell" style="background:#3155c4" title="row 16, col 16: 60"></div>
+<div class="cx-tile" role="gridcell" style="background:#2b53c9" title="row 16, col 17: 62.3"></div>
+<div class="cx-tile" role="gridcell" style="background:#2751ce" title="row 16, col 18: 64.6"></div>
+<div class="cx-tile" role="gridcell" style="background:#E5E7EB" title="row 16, col 19: missing"></div>
+<div class="cx-tile" role="gridcell" style="background:#224fd2" title="row 16, col 20: 69.2"></div>
+</div>
+<div class="cx-row" role="row">
+<div class="cx-tile" role="gridcell" style="background:#bc8940" title="row 17, col 1: 27.2"></div>
+<div class="cx-tile" role="gridcell" style="background:#b1854a" title="row 17, col 2: 29.5"></div>
+<div class="cx-tile" role="gridcell" style="background:#a68055" title="row 17, col 3: 31.8"></div>
+<div class="cx-tile" role="gridcell" style="background:#9a7c60" title="row 17, col 4: 34.1"></div>
+<div class="cx-tile" role="gridcell" style="background:#8e786c" title="row 17, col 5: 36.4"></div>
+<div class="cx-tile" role="gridcell" style="background:#827377" title="row 17, col 6: 38.7"></div>
+<div class="cx-tile" role="gridcell" style="background:#E5E7EB" title="row 17, col 7: missing"></div>
+<div class="cx-tile" role="gridcell" style="background:#6f6c8a" title="row 17, col 8: 43.3"></div>
+<div class="cx-tile" role="gridcell" style="background:#656893" title="row 17, col 9: 45.6"></div>
+<div class="cx-tile" role="gridcell" style="background:#5d659b" title="row 17, col 10: 47.9"></div>
+<div class="cx-tile" role="gridcell" style="background:#5462a3" title="row 17, col 11: 50.2"></div>
+<div class="cx-tile" role="gridcell" style="background:#4a5eac" title="row 17, col 12: 52.5"></div>
+<div class="cx-tile" role="gridcell" style="background:#425bb4" title="row 17, col 13: 54.8"></div>
+<div class="cx-tile" role="gridcell" style="background:#3a59bb" title="row 17, col 14: 57.1"></div>
+<div class="cx-tile" role="gridcell" style="background:#3356c2" title="row 17, col 15: 59.4"></div>
+<div class="cx-tile" role="gridcell" style="background:#2d54c8" title="row 17, col 16: 61.7"></div>
+<div class="cx-tile" role="gridcell" style="background:#2852cd" title="row 17, col 17: 64"></div>
+<div class="cx-tile" role="gridcell" style="background:#E5E7EB" title="row 17, col 18: missing"></div>
+<div class="cx-tile" role="gridcell" style="background:#2350d1" title="row 17, col 19: 68.6"></div>
+<div class="cx-tile" role="gridcell" style="background:#204fd4" title="row 17, col 20: 70.9"></div>
+</div>
+<div class="cx-row" role="row">
+<div class="cx-tile" role="gridcell" style="background:#b48647" title="row 18, col 1: 28.9"></div>
+<div class="cx-tile" role="gridcell" style="background:#a98252" title="row 18, col 2: 31.2"></div>
+<div class="cx-tile" role="gridcell" style="background:#9d7d5e" title="row 18, col 3: 33.5"></div>
+<div class="cx-tile" role="gridcell" style="background:#917969" title="row 18, col 4: 35.8"></div>
+<div class="cx-tile" role="gridcell" style="background:#857474" title="row 18, col 5: 38.1"></div>
+<div class="cx-tile" role="gridcell" style="background:#E5E7EB" title="row 18, col 6: missing"></div>
+<div class="cx-tile" role="gridcell" style="background:#716d87" title="row 18, col 7: 42.7"></div>
+<div class="cx-tile" role="gridcell" style="background:#676990" title="row 18, col 8: 45"></div>
+<div class="cx-tile" role="gridcell" style="background:#5f6699" title="row 18, col 9: 47.3"></div>
+<div class="cx-tile" role="gridcell" style="background:#5663a1" title="row 18, col 10: 49.6"></div>
+<div class="cx-tile" role="gridcell" style="background:#4d5faa" title="row 18, col 11: 51.9"></div>
+<div class="cx-tile" role="gridcell" style="background:#445cb2" title="row 18, col 12: 54.2"></div>
+<div class="cx-tile" role="gridcell" style="background:#3c59ba" title="row 18, col 13: 56.5"></div>
+<div class="cx-tile" role="gridcell" style="background:#3557c0" title="row 18, col 14: 58.8"></div>
+<div class="cx-tile" role="gridcell" style="background:#2e54c7" title="row 18, col 15: 61.1"></div>
+<div class="cx-tile" role="gridcell" style="background:#2952cc" title="row 18, col 16: 63.4"></div>
+<div class="cx-tile" role="gridcell" style="background:#E5E7EB" title="row 18, col 17: missing"></div>
+<div class="cx-tile" role="gridcell" style="background:#2450d1" title="row 18, col 18: 68"></div>
+<div class="cx-tile" role="gridcell" style="background:#214fd4" title="row 18, col 19: 70.3"></div>
+<div class="cx-tile" role="gridcell" style="background:#1e4ed6" title="row 18, col 20: 72.6"></div>
+</div>
+<div class="cx-row" role="row">
+<div class="cx-tile" role="gridcell" style="background:#ac834f" title="row 19, col 1: 30.6"></div>
+<div class="cx-tile" role="gridcell" style="background:#a07e5b" title="row 19, col 2: 32.9"></div>
+<div class="cx-tile" role="gridcell" style="background:#947a66" title="row 19, col 3: 35.2"></div>
+<div class="cx-tile" role="gridcell" style="background:#887571" title="row 19, col 4: 37.5"></div>
+<div class="cx-tile" role="gridcell" style="background:#E5E7EB" title="row 19, col 5: missing"></div>
+<div class="cx-tile" role="gridcell" style="background:#736e85" title="row 19, col 6: 42.1"></div>
+<div class="cx-tile" role="gridcell" style="background:#6a6a8e" title="row 19, col 7: 44.4"></div>
+<div class="cx-tile" role="gridcell" style="background:#616797" title="row 19, col 8: 46.7"></div>
+<div class="cx-tile" role="gridcell" style="background:#59649e" title="row 19, col 9: 49"></div>
+<div class="cx-tile" role="gridcell" style="background:#4f60a7" title="row 19, col 10: 51.3"></div>
+<div class="cx-tile" role="gridcell" style="background:#465db0" title="row 19, col 11: 53.6"></div>
+<div class="cx-tile" role="gridcell" style="background:#3e5ab8" title="row 19, col 12: 55.9"></div>
+<div class="cx-tile" role="gridcell" style="background:#3757bf" title="row 19, col 13: 58.2"></div>
+<div class="cx-tile" role="gridcell" style="background:#3055c5" title="row 19, col 14: 60.5"></div>
+<div class="cx-tile" role="gridcell" style="background:#2a53cb" title="row 19, col 15: 62.8"></div>
+<div class="cx-tile" role="gridcell" style="background:#E5E7EB" title="row 19, col 16: missing"></div>
+<div class="cx-tile" role="gridcell" style="background:#2450d0" title="row 19, col 17: 67.4"></div>
+<div class="cx-tile" role="gridcell" style="background:#214fd3" title="row 19, col 18: 69.7"></div>
+<div class="cx-tile" role="gridcell" style="background:#1f4ed5" title="row 19, col 19: 72"></div>
+<div class="cx-tile" role="gridcell" style="background:#1d4ed7" title="row 19, col 20: 74.3"></div>
+</div>
+<div class="cx-row" role="row">
+<div class="cx-tile" role="gridcell" style="background:#a37f58" title="row 20, col 1: 32.3"></div>
+<div class="cx-tile" role="gridcell" style="background:#977b63" title="row 20, col 2: 34.6"></div>
+<div class="cx-tile" role="gridcell" style="background:#8b766e" title="row 20, col 3: 36.9"></div>
+<div class="cx-tile" role="gridcell" style="background:#E5E7EB" title="row 20, col 4: missing"></div>
+<div class="cx-tile" role="gridcell" style="background:#766f83" title="row 20, col 5: 41.5"></div>
+<div class="cx-tile" role="gridcell" style="background:#6c6b8c" title="row 20, col 6: 43.8"></div>
+<div class="cx-tile" role="gridcell" style="background:#636894" title="row 20, col 7: 46.1"></div>
+<div class="cx-tile" role="gridcell" style="background:#5b659c" title="row 20, col 8: 48.4"></div>
+<div class="cx-tile" role="gridcell" style="background:#5161a5" title="row 20, col 9: 50.7"></div>
+<div class="cx-tile" role="gridcell" style="background:#495eae" title="row 20, col 10: 53"></div>
+<div class="cx-tile" role="gridcell" style="background:#405bb6" title="row 20, col 11: 55.3"></div>
+<div class="cx-tile" role="gridcell" style="background:#3858bd" title="row 20, col 12: 57.6"></div>
+<div class="cx-tile" role="gridcell" style="background:#3255c3" title="row 20, col 13: 59.9"></div>
+<div class="cx-tile" role="gridcell" style="background:#2c53c9" title="row 20, col 14: 62.2"></div>
+<div class="cx-tile" role="gridcell" style="background:#E5E7EB" title="row 20, col 15: missing"></div>
+<div class="cx-tile" role="gridcell" style="background:#2551d0" title="row 20, col 16: 66.8"></div>
+<div class="cx-tile" role="gridcell" style="background:#2250d2" title="row 20, col 17: 69.1"></div>
+<div class="cx-tile" role="gridcell" style="background:#1f4fd5" title="row 20, col 18: 71.4"></div>
+<div class="cx-tile" role="gridcell" style="background:#1e4ed6" title="row 20, col 19: 73.7"></div>
+<div class="cx-tile" role="gridcell" style="background:#1d4ed8" title="row 20, col 20: 76"></div>
+</div>
+</div>
+<div class="cx-legend" aria-label="Legend"><span class="cx-legend-label">Low (quantile)</span><div class="cx-legend-bar" style="background:linear-gradient(90deg, #F59E0B, #1D4ED8);"></div><span class="cx-legend-label">High</span></div>
+</div>
+</body>
+</html>
